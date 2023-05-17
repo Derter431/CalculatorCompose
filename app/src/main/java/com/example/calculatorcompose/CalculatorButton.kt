@@ -39,7 +39,7 @@ fun CalculatorButton(
 
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .clip(RoundedCornerShape(30))
+            .clip(RoundedCornerShape(100))
             .clickable { onClick() }
             .then(modifier)
 

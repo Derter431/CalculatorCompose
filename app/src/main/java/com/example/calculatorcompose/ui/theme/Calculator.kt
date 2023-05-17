@@ -1,8 +1,14 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class,
+    ExperimentalFoundationApi::class
+)
 
 package com.example.calculatorcompose.ui.theme
 
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +16,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -22,9 +38,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -34,6 +53,13 @@ import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,15 +67,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.palette.graphics.Palette
 import com.example.calculatorcompose.CalculatorAction
 import com.example.calculatorcompose.CalculatorButton
 import com.example.calculatorcompose.CalculatorOperation
 import com.example.calculatorcompose.CalculatorState
+import com.example.calculatorcompose.R
+import kotlinx.coroutines.launch
+
+
+
 
 
 @Composable
-
-
 
 fun Calculator(
     state:CalculatorState,
@@ -59,12 +89,130 @@ fun Calculator(
 
 ) {
     Box(modifier = modifier) {
+
+        val pictures = listOf(
+            R.drawable.first,
+            R.drawable.second,
+            R.drawable.third,
+            R.drawable.fourth,
+            R.drawable.five
+        )
+        val pagerState = rememberPagerState()
+        val scope = rememberCoroutineScope()
+
+
+
+
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .align(Alignment.BottomCenter)){
+            HorizontalPager(
+                pageCount = pictures.size,
+                state = pagerState,
+                key = { pictures[it] },
+                pageSize = PageSize.Fill
+            ) { index ->
+                Image(
+                    painter = painterResource(id = pictures[index]),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+
+            Box(
+
+                modifier = Modifier
+                    .offset(y = (16).dp)
+                    .alpha(0.3F)
+                    .fillMaxWidth(0.5f)
+                    .clip(RoundedCornerShape(100))
+                    .background(MaterialTheme.colorScheme.onSurfaceVariant)
+                    .align(Alignment.TopCenter)
+
+
+
+
+
+            ) {
+                IconButton(
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(
+                                pagerState.currentPage - 1
+                            )
+
+                        }
+
+                    },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        contentDescription = "Go back"
+                    )
+                }
+
+
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(
+                                    pagerState.currentPage + 1
+                                )
+
+                            }
+
+                        },
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = "Go forward"
+                        )
+
+
+                }
+            }
+
+            val context = LocalContext.current
+
+            /* Convert our Image Resource into a Bitmap */
+            val bitmap = remember {
+                BitmapFactory.decodeResource(context.resources, pictures[0]) //ПОМЕНЯТЬ
+            }
+
+            /* Create the Palette, pass the bitmap to it */
+            val palette = remember {
+                Palette.from(bitmap).generate()
+            }
+            val darkVibrant = palette.darkVibrantSwatch
+            val vibrant = palette.vibrantSwatch
+            val lightMuted = palette.lightMutedSwatch
+            val muted = palette.mutedSwatch
+            val darkMuted = palette.darkMutedSwatch
+            val lightVibrant = palette.lightVibrantSwatch
+
+
+        }
+
+
+
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter),
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(buttonSpacing)
         ) {
+
+
+
+
+
+
 
             val gradientColors = listOf(MaterialTheme.colorScheme.onPrimaryContainer,MaterialTheme.colorScheme.onSecondary,MaterialTheme.colorScheme.onPrimary)
             var text by remember { mutableStateOf("") }
@@ -73,6 +221,7 @@ fun Calculator(
                 Brush.linearGradient(
                     colors = gradientColors
                 )
+
             }
 
             TextField(
@@ -292,3 +441,6 @@ fun Calculator(
         }
     }
 }
+
+
+
