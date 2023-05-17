@@ -31,6 +31,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 
 
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,14 +41,17 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CalculatorComposeTheme {
+
+
                 val viewModel = viewModel<CalculatorViewModel>()
                 val state = viewModel.state
+
                 Calculator(
                     state = state,
                     onAction = viewModel::onAction,
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.onSurfaceVariant)
+
 
                 )
 

@@ -5,6 +5,8 @@
 package com.example.calculatorcompose.ui.theme
 
 import android.graphics.BitmapFactory
+import android.graphics.Color.parseColor
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -77,8 +80,6 @@ import kotlinx.coroutines.launch
 
 
 
-
-
 @Composable
 
 fun Calculator(
@@ -88,114 +89,136 @@ fun Calculator(
     onAction: (CalculatorAction) -> Unit
 
 ) {
-    Box(modifier = modifier) {
 
-        val pictures = listOf(
-            R.drawable.first,
-            R.drawable.second,
-            R.drawable.third,
-            R.drawable.fourth,
-            R.drawable.five
-        )
-        val pagerState = rememberPagerState()
-        val scope = rememberCoroutineScope()
-
+    val pictures = listOf(
+        R.drawable.first,
+        R.drawable.second,
+        R.drawable.third,
+        R.drawable.fourth,
+        R.drawable.five
+    )
+    val pagerState = rememberPagerState()
+    val scope = rememberCoroutineScope()
 
 
 
-        Box(modifier = Modifier
+
+
+    Box(
+        modifier = Modifier
             .fillMaxSize()
-            .align(Alignment.BottomCenter)){
-            HorizontalPager(
-                pageCount = pictures.size,
-                state = pagerState,
-                key = { pictures[it] },
-                pageSize = PageSize.Fill
-            ) { index ->
-                Image(
-                    painter = painterResource(id = pictures[index]),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+
+    ) {
+        HorizontalPager(
+            pageCount = pictures.size,
+            state = pagerState,
+            key = { pictures[it] },
+            pageSize = PageSize.Fill
+
+        ) { index ->
+            Image(
+                painter = painterResource(id = pictures[index]),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+        }
+
+        Box(
+
+            modifier = Modifier
+                .offset(y = (16).dp)
+                .alpha(0.3F)
+                .fillMaxWidth(0.5f)
+                .clip(RoundedCornerShape(100))
+                .background(MaterialTheme.colorScheme.onSurfaceVariant)
+                .align(Alignment.TopCenter)
+
+
+        ) {
+            IconButton(
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(
+                            pagerState.currentPage - 1
+
+                        )
+
+                    }
+
+                },
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    contentDescription = "Go back"
                 )
             }
 
 
-            Box(
-
-                modifier = Modifier
-                    .offset(y = (16).dp)
-                    .alpha(0.3F)
-                    .fillMaxWidth(0.5f)
-                    .clip(RoundedCornerShape(100))
-                    .background(MaterialTheme.colorScheme.onSurfaceVariant)
-                    .align(Alignment.TopCenter)
-
-
-
-
-
-            ) {
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(
-                                pagerState.currentPage - 1
-                            )
-
-                        }
-
-                    },
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowLeft,
-                        contentDescription = "Go back"
-                    )
-                }
-
-
-                    IconButton(
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(
-                                    pagerState.currentPage + 1
-                                )
-
-                            }
-
-                        },
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowRight,
-                            contentDescription = "Go forward"
+            IconButton(
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(
+                            pagerState.currentPage + 1
                         )
 
+                    }
 
-                }
+                },
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Go forward"
+                )
+
+
             }
-
-            val context = LocalContext.current
-
-            /* Convert our Image Resource into a Bitmap */
-            val bitmap = remember {
-                BitmapFactory.decodeResource(context.resources, pictures[0]) //ПОМЕНЯТЬ
-            }
-
-            /* Create the Palette, pass the bitmap to it */
-            val palette = remember {
-                Palette.from(bitmap).generate()
-            }
-            val darkVibrant = palette.darkVibrantSwatch
-            val vibrant = palette.vibrantSwatch
-            val lightMuted = palette.lightMutedSwatch
-            val muted = palette.mutedSwatch
-            val darkMuted = palette.darkMutedSwatch
-            val lightVibrant = palette.lightVibrantSwatch
-
-
         }
+
+
+
+    }
+
+
+
+
+
+    Box(modifier = modifier) {
+
+        val context = LocalContext.current
+
+        /* Convert our Image Resource into a Bitmap */
+        val bitmap = remember {
+            BitmapFactory.decodeResource(context.resources, pictures[pagerState.currentPage]) //ПОМЕНЯТЬ
+        }
+
+        /* Create the Palette, pass the bitmap to it */
+        val palette = remember {
+            Palette.from(bitmap).generate()
+        }
+        val darVibrant = palette.darkVibrantSwatch
+        val vibant = palette.vibrantSwatch
+        val lighMuted = palette.lightMutedSwatch
+        val mued = palette.mutedSwatch
+        val darMuted = palette.darkMutedSwatch
+        val lighVibrant = palette.lightVibrantSwatch
+
+        val darkVibrant = darVibrant?.let { Color(it.rgb) }
+            ?: Color.Transparent
+        val vibrant = vibant?.let { Color(it.rgb) }
+            ?: Color.Transparent
+        val lightMuted = lighMuted?.let { Color(it.rgb) }
+            ?: Color.Transparent
+        val muted = mued?.let { Color(it.rgb) }
+            ?: Color.Transparent
+        val darkMuted = darMuted?.let { Color(it.rgb) }
+            ?: Color.Transparent
+        val lightVibrant = lighVibrant?.let { Color(it.rgb) }
+            ?: Color.Transparent
+
 
 
 
@@ -255,7 +278,7 @@ fun Calculator(
             ) {
                 CalculatorButton(symbol = "AC",
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.outline)
+                        .background(darkVibrant)
                         .aspectRatio(2f)
                         .weight(2f),
                     onClick = {
@@ -264,7 +287,7 @@ fun Calculator(
                 )
                 CalculatorButton(symbol = "Del",
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.outline)
+                        .background(darkVibrant)
                         .aspectRatio(1f)
                         .weight(1f),
                     onClick = {
@@ -273,7 +296,7 @@ fun Calculator(
                 )
                 CalculatorButton(symbol = "/",
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.onPrimary)
+                        .background(vibrant)
                         .aspectRatio(1f)
                         .weight(1f),
                     onClick = {
@@ -287,7 +310,7 @@ fun Calculator(
             ) {
                 CalculatorButton(symbol = "7",
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.onSecondary)
+                        .background(lightVibrant)
                         .aspectRatio(1f)
                         .weight(1f),
                     onClick = {
@@ -296,7 +319,7 @@ fun Calculator(
                 )
                 CalculatorButton(symbol = "8",
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.onSecondary)
+                        .background(lightMuted)
                         .aspectRatio(1f)
                         .weight(1f),
                     onClick = {
@@ -305,7 +328,7 @@ fun Calculator(
                 )
                 CalculatorButton(symbol = "9",
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.onSecondary)
+                        .background(muted)
                         .aspectRatio(1f)
                         .weight(1f),
                     onClick = {
@@ -314,7 +337,7 @@ fun Calculator(
                 )
                 CalculatorButton(symbol = "x",
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.onPrimary)
+                        .background(darkMuted)
                         .aspectRatio(1f)
                         .weight(1f),
                     onClick = {

@@ -48,7 +48,7 @@ fun CalculatorButton(
         Text(text = symbol,
         fontSize =  30.sp,
             fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colorScheme.inversePrimary
+        color = Color.Black
 
         )
 
