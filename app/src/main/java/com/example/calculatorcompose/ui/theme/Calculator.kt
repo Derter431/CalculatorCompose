@@ -70,8 +70,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -248,23 +250,19 @@ Box(modifier = modifier) {
 
 
 
-      val gradientColors = listOf( Color.White,Color.LightGray, Color.DarkGray)
-      var text by remember { mutableStateOf("") }
-      val offset = Offset(5.0f, 10.0f)
-      val brush = remember {
-          Brush.linearGradient(
-              colors = gradientColors
-          )
 
-      }
+      var text by remember { mutableStateOf("") }
+      val offset = Offset(0.0f, 0.0f)
+
 
       TextField(
 
           value = state.number1 + (state.operation?.symbol ?: "") + state.number2,
           onValueChange = {},
           textStyle = TextStyle(
-              brush=brush,
               fontSize = 70.sp,
+              fontStyle = FontStyle.Italic,
+              color = Color.White,
               textAlign = TextAlign.End,
               shadow = Shadow(
                   color = Color.Black, offset = offset, blurRadius = 11f
@@ -275,7 +273,7 @@ Box(modifier = modifier) {
               unfocusedIndicatorColor = Transparent,
               focusedIndicatorColor = Transparent ),
           maxLines = 2,
-          readOnly = false,
+          readOnly = true,
           modifier = Modifier.fillMaxWidth(),
 
 
